@@ -1,10 +1,14 @@
 package com.example.healthrag.agent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ClinicalAgent {
+
+    private static final Logger log = LoggerFactory.getLogger(ClinicalAgent.class);
 
     private final ChatClient chatClient;
 
@@ -21,7 +25,10 @@ public class ClinicalAgent {
     }
 
     public StructuredConsultation consult(String patientId, String question) {
+        log.info("Consulting agent for patient {} — question: {}", patientId, question);
         String prompt = String.format("Patient ID: %s\n\nQuestion: %s", patientId, question);
-        return chatClient.prompt(prompt).call().entity(StructuredConsultation.class);
+        StructuredConsultation result = chatClient.prompt(prompt).call().entity(StructuredConsultation.class);
+        log.info("Agent consultation complete for patient {}", patientId);
+        return result;
     }
 }
